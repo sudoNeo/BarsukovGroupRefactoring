@@ -47,7 +47,7 @@ import time
 import threading
 import multiprocessing
 import queue
-
+import numpy as np
 # you may need to install these python modules
 try:
     import vxi11            # required
@@ -165,7 +165,6 @@ def write_to_file(f_name, s_channels, lst_stream):
                 f_ptr.write(s_val_fmt%tuple(smpl)+'\n')
     show_status('%s written'%f_name)
 
-import numpy as np
 
 def alternatewrite_to_file(f_name, lst_stream):
     show_status('writing %s ...' % f_name)
