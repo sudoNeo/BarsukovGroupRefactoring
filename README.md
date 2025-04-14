@@ -22,11 +22,10 @@ git submodule update
 If you don’t already have a Conda environment for this project, create one using a compatible version of Python. Then, activate it:
 
 ```bash
-conda create -n barsukov_env python=3.x
+conda create -n barsukov_env
 conda activate barsukov_env
 ```
 
-*Replace `3.x` with your desired Python version (e.g., `python=3.8`).*
 
 #### 3. Install Python Dependencies
 
