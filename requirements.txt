@@ -1,0 +1,5 @@
+pandas
+numba
+zmq
+py-xdrlib
+csv

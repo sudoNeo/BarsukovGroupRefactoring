@@ -1,0 +1,3 @@
+[submodule "python-vxi11"]
+	path = python-vxi11
+	url = https://github.com/python-ivi/python-vxi11.git
