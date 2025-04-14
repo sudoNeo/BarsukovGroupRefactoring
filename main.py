@@ -47,7 +47,7 @@ import time
 import threading
 import multiprocessing
 import queue
-
+import numpy as np
 # you may need to install these python modules
 try:
     import vxi11            # required
@@ -167,30 +167,41 @@ def write_to_file(f_name, s_channels, lst_stream):
 
 
 def alternatewrite_to_file(f_name, lst_stream):
-    show_status('writing %s ...'%f_name)
-    tempdf = pd.DataFrame
-    finaldf = pd.DataFrame
-    '''
-    Need to split list into list of lists
-        Need 16 intervals between timestamp2 and timestamp1
-    '''
-    for i in range(len(lst_stream)):
-        #need to grab each rowmain
-        #below code will not work for final row, will need extrapolation
-        currentTime = lst_stream[i][0]
-        nextTime = lst_stream[i+1][0]
-        tempdf = pd.DataFrame(lst_stream[i])
-        tempdf = tempdf.iloc[]
-        timeList = pd.Series.interpolate()
-        for j in range(32):
-
-
-
-
+    show_status('writing %s ...' % f_name)
+    
+    # Initialize a list to store interpolated data
+    interpolated_data = []
+    
+    # Process all pairs except the last point
+    for i in range(len(lst_stream) - 1):
+        current_time = lst_stream[i][0]
+        next_time = lst_stream[i + 1][0]
+        current_x = lst_stream[i][1]
+        current_y = lst_stream[i][2]
+        next_x = lst_stream[i + 1][1]
+        next_y = lst_stream[i + 1][2]
+        
+        # Create 16 intervals (including start point, excluding end point)
+        num_intervals = 16
+        time_steps = np.linspace(current_time, next_time, num_intervals + 1, endpoint=False)
+        x_steps = np.linspace(current_x, next_x, num_intervals + 1, endpoint=False)
+        y_steps = np.linspace(current_y, next_y, num_intervals + 1, endpoint=False)
+        
+        # Add interpolated points to the result
+        for t, x, y in zip(time_steps, x_steps, y_steps):
+            interpolated_data.append([t, x, y])
+    
+    # Add the final point
+    interpolated_data.append(lst_stream[-1])
+    
+    # Write to CSV
     with open(f_name, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["timestamp", "X", "Y"])
-        writer.writerows(lst_stream)
+        writer.writerows(interpolated_data)
+    
+    show_status('%s written' % f_name)
+
 
 
 
