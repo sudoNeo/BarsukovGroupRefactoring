@@ -47,8 +47,7 @@ import time
 import threading
 import multiprocessing
 import queue
-
-from numba import njit
+#from numba import njit
 
 # you may need to install these python modules
 try:
@@ -392,9 +391,9 @@ if __name__ == '__main__':
     # group the docopt stuff to make it easier to remove, if desired
     #dict_options = docopt.docopt(USE_STR, version='0.0.2')  #pylint: disable=invalid-name
     dict_options1 = {
-        '--address': '10.0.0.3',
+        '--address': '192.168.1.156',
         '--duration': 12,
-        '--file': 'thread1.csv',
+        '--file': 'thread1_1.csv',
         '--ints':False,
         '--length': 0,
         '--port': 1865,
@@ -416,14 +415,14 @@ if __name__ == '__main__':
         '--vars': 'XY'
     }
     test(dict_options1)
-    #process1 = multiprocessing.Process(target=test, args=(dict_options1,))
+    process1 = multiprocessing.Process(target=test, args=(dict_options1,))
     #process2 = multiprocessing.Process(target=test, args=(dict_options2,))
-    #process1.start()
+    process1.start()
     print("process1 started")
-    #time.sleep(2)
+    time.sleep(2)
     #process2.start()
-    #print("process2 started")
-    #process1.join()
+    print("process2 started")
+    process1.join()
     #process2.join()
     print("simultaneous threads are done!")
     #cleanup_ifcs() #commenting out to see if there are erros

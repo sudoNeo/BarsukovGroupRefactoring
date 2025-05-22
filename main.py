@@ -48,6 +48,8 @@ import threading
 import multiprocessing
 import queue
 import numpy as np
+import os
+
 # you may need to install these python modules
 try:
     import vxi11            # required
@@ -59,7 +61,8 @@ except ImportError:
 #except ImportError:
 #    print('python docopt library not found. Please install docopt')
 
-
+if os.environ.get('MOCK_HARDWARE') == 'True':
+    from .mocks import MockUDPSocket, MockVXI11Instrument
 USE_STR = """
  --Stream Data from an SR865 to a file--
  Usage:
@@ -110,11 +113,16 @@ def open_interfaces(ipadd, port):
     global the_vx_ifc       #pylint: disable=global-statement, invalid-name
     print('\nopening incoming UDP Socket at %d ...' % port, end=' ')
     the_udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    the_udp_socket.bind(('', port))      # listen to anything arriving on this port from anyone
-    print('done')
-    print('opening VXI-11 at %s ...' % ipadd, end=' ')
-    the_vx_ifc = vxi11.Instrument(ipadd)
-    the_vx_ifc.write('STREAMPORT %d'%port)
+    if os.environ.get('MOCK_HARDWARE') == 'True':
+        print('Using Mock Hardware')
+        the_udp_socket = MockUDPSocket()
+        the_vx_ifc = MOCKVXI11Instrument(ipadd)
+    else:
+        the_udp_socket.bind(('', port))      # listen to anything arriving on this port from anyone
+        print('done')
+        print('opening VXI-11 at %s ...' % ipadd, end=' ')
+        the_vx_ifc = vxi11.Instrument(ipadd)
+        the_vx_ifc.write('STREAMPORT %d'%port)
     print('done')
 
 
@@ -348,7 +356,7 @@ def test(opts):     #pylint: disable=too-many-locals, too-many-statements
             # the_threads[-1].setDaemon(True)
             the_threads[-1].start()
         s_no_printing = '' if bshow_status else 'silently'
-        print('threads started %s\n'%s_no_printing)
+        print('threads started %s\n'%s_no_printing) 
         the_threads[0].join(duration_stream+2)    # time out 2 seconds after the expected duration
         the_threads[1].join(duration_stream*2)    # time out 2x the duration more
         # queue_drops.get() blocks until empty_queue() writes to queue_drops showing it finished.
@@ -380,7 +388,7 @@ if __name__ == '__main__':
     # group the docopt stuff to make it easier to remove, if desired
     #dict_options = docopt.docopt(USE_STR, version='0.0.2')  #pylint: disable=invalid-name
     dict_options1 = {
-        '--address': '10.0.0.3',
+        '--address': '192.168.1.51',
         '--duration': 12,
         '--file': 'thread1.csv',
         '--ints':False,

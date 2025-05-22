@@ -1,5 +1,9 @@
+vxi11
+docopt
 pandas
 numba
+python-dateutil
+six
 zmq
 py-xdrlib
 
